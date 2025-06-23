@@ -8,7 +8,7 @@ import { Project } from '../BD/schemas/projects.schema';
 import { Comment } from '../BD/schemas/comments.schema';
 import { Badge } from '../BD/schemas/badges.schema';
 import { AIReview } from '../BD/schemas/ai_review.schema';
-import { PaginationDto } from 'src/dtos/paginate.dto';
+import { PaginationDto } from '../dtos/paginate.dto';
 
 @Injectable()
 export class ProcesosService {
