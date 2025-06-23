@@ -6,22 +6,22 @@ export type RatingDocument = HydratedDocument<Rating>;
 @Schema()
 export class Rating {
 
-  @Prop()
+  @Prop({default:''})
   projectID: string;
 
-  @Prop()
+  @Prop({default:''})
   teacherID: string;
 
-  @Prop()
+  @Prop({default:''})
   score: number;
 
-  @Prop()
+  @Prop({default:''})
   feedback: string;
 
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 }
 

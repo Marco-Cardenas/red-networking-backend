@@ -6,16 +6,16 @@ export type AIReviewDocument = HydratedDocument<AIReview>;
 @Schema()
 export class AIReview {
 
-  @Prop()
+  @Prop({default:''})
   projectID: string;
 
-  @Prop()
+  @Prop({default:''})
   content: string;
   
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 
 }

@@ -6,19 +6,19 @@ export type BadgeDocument = HydratedDocument<Badge>;
 @Schema()
 export class Badge {
 
-  @Prop()
+  @Prop({default:''})
   title: string;
 
-  @Prop()
+  @Prop({default:''})
   description: string;
 
-  @Prop()
+  @Prop({default:''})
   icon: string;
 
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 
 }

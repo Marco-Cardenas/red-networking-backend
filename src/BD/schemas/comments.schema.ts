@@ -6,19 +6,19 @@ export type CommentDocument = HydratedDocument<Comment>;
 @Schema()
 export class Comment {
 
-  @Prop()
+  @Prop({default:''})
   projectID: string;
 
-  @Prop()
+  @Prop({default:''})
   authorID: string;
 
-  @Prop()
+  @Prop({default:''})
   content: string;
 
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 }
 

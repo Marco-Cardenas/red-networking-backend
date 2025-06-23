@@ -6,16 +6,16 @@ export type RankingDocument = HydratedDocument<Ranking>;
 @Schema()
 export class Ranking {
 
-  @Prop()
+  @Prop({default:''})
   userID: string;
 
-  @Prop()
+  @Prop({default:''})
   averageScore: number;
   
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 
 }

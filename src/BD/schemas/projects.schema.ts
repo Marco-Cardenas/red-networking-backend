@@ -5,40 +5,40 @@ export type ProjectDocument = HydratedDocument<Project>;
 
 @Schema()
 export class Project {
-  @Prop()
+  @Prop({default:''})
   title: string;
 
-  @Prop()
+  @Prop({default:''})
   email: string;
 
-  @Prop()
+  @Prop({default:''})
   description: string;
 
-  @Prop([String])
+  @Prop({typo: [String], default:''})
   technologies: string[];
 
-  @Prop()
+  @Prop({default:''})
   subject: string;
 
-  @Prop()
+  @Prop({default:''})
   type: string;
 
-  @Prop([String])
+  @Prop({typo: [String], default:''})
   authors: string[];
 
-  @Prop([String])
+  @Prop({typo: [String], default:''})
   files: string[];
 
-  @Prop([String])
+  @Prop({typo: [String], default:''})
   tags: string[];
 
-  @Prop()
+  @Prop({default:0})
   averageRating: number;
 
-  @Prop()
+  @Prop({default:Date.now})
   createdAt: Date;
 
-  @Prop()
+  @Prop({default:Date.now})
   updatedAt: Date;
 }
 
