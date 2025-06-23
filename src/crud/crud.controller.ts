@@ -1,16 +1,23 @@
-import { Controller, Post, Get, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, Res, HttpStatus, Query } from '@nestjs/common';
 import { ProcesosService } from '../procesos/procesos.service';
+import { PaginationDto } from 'src/dtos/paginate.dto';
 
 @Controller('api')
 export class CrudController {
   constructor(private readonly procesosService: ProcesosService) {}
 
   @Get('pagina_principal')
-  async pagina_principal(@Res() respuesta) {
-    const datosJSON = await this.procesosService.pagina_principal();
-
+  async pagina_principal(@Res() respuesta, @Query() paginationDto: PaginationDto) {
+    const data = await this.procesosService.pagina_principal(paginationDto);
+    if(!data.operation){
+      return respuesta.status(HttpStatus.BAD_REQUEST).json({
+        data: null,
+        proceso: false,
+        message: data.message
+      });
+    }
     return respuesta.status(HttpStatus.OK).json({
-      DatosJSON: datosJSON,
+      data: data.data,
       proceso: true
     });
   }
