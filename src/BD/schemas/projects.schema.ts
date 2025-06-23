@@ -3,43 +3,34 @@ import { HydratedDocument } from 'mongoose';
 
 export type ProjectDocument = HydratedDocument<Project>;
 
-@Schema()
+@Schema({ collection: 'projects' })
 export class Project {
-  @Prop({default:''})
+  @Prop()
   title: string;
 
-  @Prop({default:''})
-  email: string;
-
-  @Prop({default:''})
-  description: string;
-
-  @Prop({typo: [String], default:''})
-  technologies: string[];
-
-  @Prop({default:''})
-  subject: string;
-
-  @Prop({default:''})
-  type: string;
-
-  @Prop({typo: [String], default:''})
+  @Prop([String])
   authors: string[];
 
-  @Prop({typo: [String], default:''})
-  files: string[];
+  @Prop()
+  date: Date;
 
-  @Prop({typo: [String], default:''})
+  @Prop([String])
   tags: string[];
 
-  @Prop({default:0})
-  averageRating: number;
+  @Prop()
+  description: string;
 
-  @Prop({default:Date.now})
-  createdAt: Date;
+  @Prop()
+  repositoryLink: string;
 
-  @Prop({default:Date.now})
-  updatedAt: Date;
+  @Prop([String])
+  tools: string[];
+
+  @Prop()
+  image: string;
+
+  @Prop()
+  document: string; 
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

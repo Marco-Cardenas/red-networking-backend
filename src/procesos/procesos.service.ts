@@ -24,4 +24,15 @@ export class ProcesosService {
   async pagina_principal() {
     return "Hola desde procesos";
   }
+
+  async crearProyecto(data: any) {
+    console.log('Datos recibidos:', data); // <-- Agrega esto
+    const now = new Date();
+    const proyecto = new this.projectModel({
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+    });
+    return proyecto.save();
+  }
 }
