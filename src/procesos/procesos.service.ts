@@ -14,7 +14,7 @@ export class ProcesosService {
   constructor(
     @InjectModel('users') private readonly userModel: Model<User>,
     @InjectModel('ratings') private readonly ratingModel: Model<Rating>,
-    @InjectModel('ranking') private readonly rankingModel: Model<Ranking>,
+    @InjectModel('rankings') private readonly rankingModel: Model<Ranking>,
     @InjectModel('projects') private readonly projectModel: Model<Project>,
     @InjectModel('comments') private readonly commentModel: Model<Comment>,
     @InjectModel('badges') private readonly badgeModel: Model<Badge>,
