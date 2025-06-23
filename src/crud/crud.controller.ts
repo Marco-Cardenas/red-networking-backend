@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Body, Res, HttpStatus, Query } from '@nestjs/common';
 import { ProcesosService } from '../procesos/procesos.service';
-import { PaginationDto } from 'src/dtos/paginate.dto';
+import { PaginationDto } from '../dtos/paginate.dto';
 
 @Controller('api')
 export class CrudController {

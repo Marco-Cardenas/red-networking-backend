@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ProcesosService } from './procesos.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from 'src/BD/schemas/users.schema';
-import { RatingSchema } from 'src/BD/schemas/ratings.schema';
-import { RankingSchema } from 'src/BD/schemas/rankings.schema';
-import { ProjectSchema } from 'src/BD/schemas/projects.schema';
-import { CommentSchema } from 'src/BD/schemas/comments.schema';
-import { BadgeSchema } from 'src/BD/schemas/badges.schema';
-import { AIReviewSchema } from 'src/BD/schemas/ai_review.schema';
+import { UserSchema } from '../BD/schemas/users.schema';
+import { RatingSchema } from '../BD/schemas/ratings.schema';
+import { RankingSchema } from '../BD/schemas/rankings.schema';
+import { ProjectSchema } from '../BD/schemas/projects.schema';
+import { CommentSchema } from '../BD/schemas/comments.schema';
+import { BadgeSchema } from '../BD/schemas/badges.schema';
+import { AIReviewSchema } from '../BD/schemas/ai_review.schema';
 
 @Module({
   imports: [
