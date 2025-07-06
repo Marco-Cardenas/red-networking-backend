@@ -105,4 +105,20 @@ export class CrudController {
     }
   }
 
+  @Get('ranking')
+  async ranking(@Res() respuesta) {
+    const data = await this.procesosService.ranking();
+    if(!data.operation){
+      return respuesta.status(HttpStatus.BAD_REQUEST).json({
+        data: null,
+        proceso: false,
+       message: data.message
+      });
+    }
+    return respuesta.status(HttpStatus.OK).json({
+      data: data.data,
+      proceso: true
+    });
+  }
+
 }

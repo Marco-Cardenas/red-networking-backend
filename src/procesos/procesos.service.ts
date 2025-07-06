@@ -89,7 +89,7 @@ export class ProcesosService {
   }
 
   async agregarComentario(idProyecto: string, data: any) {
- 
+
     const nuevoComentario = await this.commentModel.create({
       ...data,
       projectID: idProyecto,
@@ -97,7 +97,7 @@ export class ProcesosService {
       updatedAt: new Date(),
       likes: [],
     });
-  
+
     await this.projectModel.findByIdAndUpdate(
       idProyecto,
       { $push: { comments: nuevoComentario._id } }
@@ -110,5 +110,40 @@ export class ProcesosService {
       { authors: userId },
       { _id: 1, title: 1, repositoryLink: 1 }
     );
+  }
+
+  async ranking() {
+    try {
+      // Obtener todos los proyectos con sus puntuaciones
+      const proyectos = await this.projectModel.find();
+      // Calcular la suma de puntuaciones para cada proyecto y ordenar
+      const proyectosConPuntuacion = proyectos.map(proyecto => {
+        const sumaPuntuacion = proyecto.puntuacion && proyecto.puntuacion.length > 0 
+          ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0) 
+          : 0;
+        
+        return {
+          ...proyecto.toObject(),
+          sumaPuntuacion
+        };
+      });
+
+      // Ordenar de mayor a menor puntuación y tomar solo los primeros 10
+      const top10Proyectos = proyectosConPuntuacion
+        .sort((a, b) => b.sumaPuntuacion - a.sumaPuntuacion)
+        .slice(0, 10);
+
+      return {
+        data: top10Proyectos,
+        operation: true
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        message: 'Error Interno',
+        operation: false,
+        data: null
+      }
+    }
   }
 }
