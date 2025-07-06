@@ -8,7 +8,7 @@ export class Project {
   @Prop()
   title: string;
 
-  @Prop([String])
+  @Prop({ type: [{ type: 'ObjectId', ref: 'User' }], default: [] })
   authors: string[];
 
   @Prop()

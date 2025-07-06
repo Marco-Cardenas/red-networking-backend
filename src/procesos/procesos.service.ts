@@ -87,4 +87,28 @@ export class ProcesosService {
     const suma = proyecto.puntuacion.reduce((acc, val) => acc + val, 0);
     return suma / proyecto.puntuacion.length;
   }
+
+  async agregarComentario(idProyecto: string, data: any) {
+ 
+    const nuevoComentario = await this.commentModel.create({
+      ...data,
+      projectID: idProyecto,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      likes: [],
+    });
+  
+    await this.projectModel.findByIdAndUpdate(
+      idProyecto,
+      { $push: { comments: nuevoComentario._id } }
+    );
+    return nuevoComentario;
+  }
+
+  async obtenerProyectosPorUsuario(userId: string) {
+    return this.projectModel.find(
+      { authors: userId },
+      { _id: 1, title: 1, repositoryLink: 1 }
+    );
+  }
 }

@@ -39,6 +39,19 @@ export class CrudController {
     }
   }
 
+  @Get('usuario_projects/:userId')
+  async obtenerProyectosPorUsuario(
+    @Param('userId') userId: string,
+    @Res() res
+  ) {
+    try {
+      const proyectos = await this.procesosService.obtenerProyectosPorUsuario(userId);
+      return res.status(HttpStatus.OK).json({ ok: true, proyectos });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
   @Post('projects/:id/agregar-puntuacion')
   async agregarPuntuacion(
     @Param('id') id: string,
@@ -73,6 +86,20 @@ export class CrudController {
         return res.status(HttpStatus.NOT_FOUND).json({ ok: false, message: 'No hay puntuaciones para este proyecto' });
       }
       return res.status(HttpStatus.OK).json({ ok: true, promedio });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Post('projects/:id/agregar-comentario')
+  async agregarComentario(
+    @Param('id') id: string,
+    @Body() body,
+    @Res() res
+  ) {
+    try {
+      const comentario = await this.procesosService.agregarComentario(id, body);
+      return res.status(HttpStatus.OK).json({ ok: true, comentario });
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
     }

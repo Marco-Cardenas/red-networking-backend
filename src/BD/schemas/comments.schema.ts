@@ -20,6 +20,9 @@ export class Comment {
 
   @Prop({default:Date.now})
   updatedAt: Date;
+
+  @Prop({ default: [] })
+  likes: string[];
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
