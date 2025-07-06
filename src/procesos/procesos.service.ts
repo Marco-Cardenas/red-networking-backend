@@ -151,4 +151,8 @@ export class ProcesosService {
     const proyecto = await this.projectModel.findById(idProyecto).populate('comments');
     return proyecto ? proyecto.comments : [];
   }
+
+  async obtenerProyecto(id: string) {
+  return this.projectModel.findById(id);
+}
 }
