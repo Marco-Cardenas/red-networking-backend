@@ -134,4 +134,7 @@ export class CrudController {
     }
   }
 
+  async obtenerProyecto(id: string) {
+    return this.projectModel.findById(id);
+  }
 }
