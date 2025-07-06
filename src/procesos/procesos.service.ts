@@ -70,4 +70,21 @@ export class ProcesosService {
     const users = await this.userModel.findById(idUser);
     return users;
   }
+
+  async agregarPuntuacion(idProyecto: string, puntuacion: number) {
+    return this.projectModel.findByIdAndUpdate(
+      idProyecto,
+      { $push: { puntuacion } },
+      { new: true }
+    );
+  }
+
+  async obtenerPromedioPuntuacion(idProyecto: string): Promise<number | null> {
+    const proyecto = await this.projectModel.findById(idProyecto);
+    if (!proyecto || !proyecto.puntuacion || proyecto.puntuacion.length === 0) {
+      return null;
+    }
+    const suma = proyecto.puntuacion.reduce((acc, val) => acc + val, 0);
+    return suma / proyecto.puntuacion.length;
+  }
 }

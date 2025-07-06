@@ -39,6 +39,23 @@ export class CrudController {
     }
   }
 
+  @Post('projects/:id/agregar-puntuacion')
+  async agregarPuntuacion(
+    @Param('id') id: string,
+    @Body('puntuacion') puntuacion: number,
+    @Res() res
+  ) {
+    if (typeof puntuacion !== 'number' || puntuacion < 1 || puntuacion > 5) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: 'La puntuación debe ser un número entre 1 y 5' });
+    }
+    try {
+      const proyectoActualizado = await this.procesosService.agregarPuntuacion(id, puntuacion);
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto: proyectoActualizado });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
   @Get('getUser/:id')
   async getUser(@Res() respuesta, @Param('id') idUser) {
     const user = await this.procesosService.getUser(idUser);
@@ -46,6 +63,19 @@ export class CrudController {
       proceso: true,
       user
     });
+  }
+
+  @Get('projects/:id/promedio-puntuacion')
+  async promedioPuntuacion(@Param('id') id: string, @Res() res) {
+    try {
+      const promedio = await this.procesosService.obtenerPromedioPuntuacion(id);
+      if (promedio === null) {
+        return res.status(HttpStatus.NOT_FOUND).json({ ok: false, message: 'No hay puntuaciones para este proyecto' });
+      }
+      return res.status(HttpStatus.OK).json({ ok: true, promedio });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
   }
 
 }
