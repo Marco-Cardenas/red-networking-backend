@@ -121,4 +121,17 @@ export class CrudController {
     });
   }
 
+  @Get('projects/:id/comentarios')
+  async obtenerComentariosProyecto(
+    @Param('id') id: string,
+    @Res() res
+  ) {
+    try {
+      const comentarios = await this.procesosService.obtenerComentariosProyecto(id);
+      return res.status(HttpStatus.OK).json({ ok: true, comentarios });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }

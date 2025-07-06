@@ -32,7 +32,7 @@ export class Project {
   @Prop({default: ''})
   document: string; 
 
-  @Prop({ type: [{ type: 'ObjectId', ref: 'Comment' }], default: [] })
+  @Prop({ type: [{ type: 'ObjectId', ref: 'comments' }], default: [] })
   comments: any[];
 
   @Prop({ type: [Number], default: [] })

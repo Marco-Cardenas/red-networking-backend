@@ -146,4 +146,9 @@ export class ProcesosService {
       }
     }
   }
+
+  async obtenerComentariosProyecto(idProyecto: string) {
+    const proyecto = await this.projectModel.findById(idProyecto).populate('comments');
+    return proyecto ? proyecto.comments : [];
+  }
 }
