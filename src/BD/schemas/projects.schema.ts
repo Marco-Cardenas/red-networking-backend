@@ -31,6 +31,12 @@ export class Project {
 
   @Prop()
   document: string; 
+
+  @Prop({ type: [{ type: 'ObjectId', ref: 'Comment' }], default: [] })
+  comments: any[];
+
+  @Prop({ type: [Number], default: [] })
+  puntuacion: number[];
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
