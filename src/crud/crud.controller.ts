@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Res, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, Res, HttpStatus, Query, Param } from '@nestjs/common';
 import { ProcesosService } from '../procesos/procesos.service';
 import { PaginationDto } from '../dtos/paginate.dto';
 
@@ -23,20 +23,29 @@ export class CrudController {
   }
 
   @Post('subida_proyecto')
-    async crearProyecto(@Body() body, @Res() res) {
-      try {
-        // Validar que imagen y documento estén en formato base64
-        if (body.image && !body.image.startsWith('data:')) {
-          return res.status(HttpStatus.BAD_REQUEST).json({ error: 'La imagen debe estar en formato base64 (data URI)', ok: false });
-        }
-        if (body.document && !body.document.startsWith('data:')) {
-          return res.status(HttpStatus.BAD_REQUEST).json({ error: 'El documento debe estar en formato base64 (data URI)', ok: false });
-        }
-        const proyecto = await this.procesosService.crearProyecto(body);
-        return res.status(HttpStatus.CREATED).json({ proyecto, ok: true });
-      } catch (error) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ error: error.message, ok: false });
+  async crearProyecto(@Body() body, @Res() res) {
+    try {
+      // Validar que imagen y documento estén en formato base64
+      if (body.image && !body.image.startsWith('data:')) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ error: 'La imagen debe estar en formato base64 (data URI)', ok: false });
       }
+      if (body.document && !body.document.startsWith('data:')) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ error: 'El documento debe estar en formato base64 (data URI)', ok: false });
+      }
+      const proyecto = await this.procesosService.crearProyecto(body);
+      return res.status(HttpStatus.CREATED).json({ proyecto, ok: true });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ error: error.message, ok: false });
     }
+  }
+
+  @Get('getUser/:id')
+  async getUser(@Res() respuesta, @Param('id') idUser) {
+    const user = await this.procesosService.getUser(idUser);
+    return respuesta.status(HttpStatus.OK).json({
+      proceso: true,
+      user
+    });
+  }
 
 }

@@ -65,4 +65,9 @@ export class ProcesosService {
     });
     return proyecto.save();
   }
+
+  async getUser(idUser) {
+    const users = await this.userModel.findById(idUser);
+    return users;
+  }
 }
