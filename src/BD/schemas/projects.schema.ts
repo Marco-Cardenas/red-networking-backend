@@ -5,31 +5,31 @@ export type ProjectDocument = HydratedDocument<Project>;
 
 @Schema({ collection: 'projects' })
 export class Project {
-  @Prop()
+  @Prop({required: true})
   title: string;
 
   @Prop({ type: [{ type: 'ObjectId', ref: 'User' }], default: [] })
   authors: string[];
 
-  @Prop()
+  @Prop({default:Date.now})
   date: Date;
 
-  @Prop([String])
+  @Prop({type:[String], default:[]})
   tags: string[];
 
-  @Prop()
+  @Prop({default:''})
   description: string;
 
-  @Prop()
+  @Prop({required:true})
   repositoryLink: string;
 
-  @Prop([String])
+  @Prop({type:[String], default: []})
   tools: string[];
 
-  @Prop()
+  @Prop({required:true})
   image: string;
 
-  @Prop()
+  @Prop({default: ''})
   document: string; 
 
   @Prop({ type: [{ type: 'ObjectId', ref: 'Comment' }], default: [] })
