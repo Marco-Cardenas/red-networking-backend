@@ -29,10 +29,10 @@ export class User {
   @Prop({default: ''})
   role: string;
 
-  @Prop({typo:[String], default: ''})
+  @Prop({type:[String], default: ''})
   links: string[];
 
-  @Prop({typo:[String], default: ''})
+  @Prop({type:[String], default: ''})
   badges: string[];
 
   @Prop({default: Date.now})
