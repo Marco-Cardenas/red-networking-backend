@@ -111,4 +111,8 @@ export class ProcesosService {
       { _id: 1, title: 1, repositoryLink: 1 }
     );
   }
+
+  async obtenerProyecto(id: string) {
+    return this.projectModel.findById(id);
+  }
 }
