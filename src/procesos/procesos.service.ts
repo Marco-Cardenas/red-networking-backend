@@ -154,5 +154,32 @@ export class ProcesosService {
 
   async obtenerProyecto(id: string) {
   return this.projectModel.findById(id);
-}
+  }
+
+
+  async agregarLikeComentario(idComentario: string, idUsuario: string) {
+    const comentario = await this.commentModel.findById(idComentario);
+    if (!comentario) {
+      throw new Error('Comentario no encontrado');
+    }
+    // Verificar si el usuario ya ha dado like
+    if (comentario.likes.includes(idUsuario)) {
+      // Si ya ha dado like, eliminarlo
+      comentario.likes = comentario.likes.filter(userId => userId !== idUsuario);
+    } else {
+      // Si no ha dado like, agregarlo
+      comentario.likes.push(idUsuario);
+    }
+    return comentario.save();
+  }
+
+  async contadorlikesComentario(idComentario: string) {
+    const comentario = await this.commentModel.findById(idComentario);
+    if (!comentario) {
+      throw new Error('Comentario no encontrado');
+    }
+    return comentario.likes.length;
+  }
+
+
 }

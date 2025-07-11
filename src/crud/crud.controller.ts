@@ -134,4 +134,31 @@ export class CrudController {
     }
   }
 
+  @Post('projects/comentarios/:commentId/like')
+  async likeComentario(
+    @Param('commentId') commentId: string,
+    @Body('userId') userId: string,
+    @Res() res
+  ) {
+    try {
+      const resultado = await this.procesosService.agregarLikeComentario(commentId, userId);
+      return res.status(HttpStatus.OK).json({ ok: true, resultado });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Get('projects/comentarios/:commentId/likes/count')
+  async contadorLikesComentario(
+    @Param('commentId') commentId: string,
+    @Res() res
+  ) {
+    try {
+      const contador = await this.procesosService.contadorlikesComentario(commentId);
+      return res.status(HttpStatus.OK).json({ ok: true, contador });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }
