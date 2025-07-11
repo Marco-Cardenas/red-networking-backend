@@ -202,19 +202,21 @@ export class ProcesosService {
 
 
   async agregarProyectoAFavoritos(userId: string, projectId: string) {
-    return this.userModel.findByIdAndUpdate(
+    await this.userModel.findByIdAndUpdate(
       userId,
       { $addToSet: { favorites: projectId } },
       { new: true }
     );
+    return { message: 'agregado a favoritos' };
   }
 
   async eliminarProyectoDeFavoritos(userId: string, projectId: string) {
-    return this.userModel.findByIdAndUpdate(
+    await this.userModel.findByIdAndUpdate(
       userId,
       { $pull: { favorites: projectId } },
       { new: true }
     );
+    return { message: 'eliminado de favoritos' };
   }
 
   async obtenerProyectosFavoritos(userId: string) {
