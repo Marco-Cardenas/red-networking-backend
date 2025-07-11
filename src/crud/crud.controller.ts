@@ -161,4 +161,31 @@ export class CrudController {
     }
   }
 
+
+  @Post('projects/:idProyecto/sumar-vistas')
+  async sumarVistasProyecto( 
+    @Param('idProyecto') idProyecto: string,
+    @Res() res
+  ) {
+    try {
+      const proyectoActualizado = await this.procesosService.sumarVistasProyecto(idProyecto);
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto: proyectoActualizado });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Get('projects/:idProyecto/vistas')
+  async obtenerVistasProyecto( 
+    @Param('idProyecto') idProyecto: string,
+    @Res() res
+  ) {
+    try {
+      const vistas = await this.procesosService.obtenerVistasProyecto(idProyecto);
+      return res.status(HttpStatus.OK).json({ ok: true, vistas });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }

@@ -37,6 +37,9 @@ export class Project {
 
   @Prop({ type: [Number], default: [] })
   puntuacion: number[];
+
+  @Prop({default: '' })
+  vistas: number;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

@@ -181,5 +181,22 @@ export class ProcesosService {
     return comentario.likes.length;
   }
 
+  async sumarVistasProyecto(idProyecto: string) {
+    const proyecto = await this.projectModel.findById(idProyecto);
+    if (!proyecto) {
+      throw new Error('Proyecto no encontrado');
+    }
+    // Incrementar el contador de vistas
+    proyecto.vistas = (proyecto.vistas || 0) + 1;
+    return proyecto.save();
+  }
+
+  async obtenerVistasProyecto(idProyecto: string) {
+    const proyecto = await this.projectModel.findById(idProyecto);
+    if (!proyecto) {
+      throw new Error('Proyecto no encontrado');
+    }
+    return proyecto.vistas || 0;
+  }
 
 }
