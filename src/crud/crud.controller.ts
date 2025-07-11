@@ -52,6 +52,8 @@ export class CrudController {
     }
   }
 
+  
+
   @Post('projects/:id/agregar-puntuacion')
   async agregarPuntuacion(
     @Param('id') id: string,
@@ -76,6 +78,22 @@ export class CrudController {
       proceso: true,
       user
     });
+  }
+
+  @Get('projects/:id') 
+  async obtenerProyectoPorId(
+    @Param('id') id: string,
+    @Res() res
+  ) {
+    try {
+      const proyecto = await this.procesosService.obtenerProyecto(id);
+      if (!proyecto) {
+        return res.status(HttpStatus.NOT_FOUND).json({ ok: false, error: 'Proyecto no encontrado' });
+      }
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
   }
 
   @Get('projects/:id/promedio-puntuacion')
