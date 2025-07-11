@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Res, HttpStatus, Query, Param } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Res, HttpStatus, Query, Param } from '@nestjs/common';
 import { ProcesosService } from '../procesos/procesos.service';
 import { PaginationDto } from '../dtos/paginate.dto';
 
@@ -183,6 +183,48 @@ export class CrudController {
     try {
       const vistas = await this.procesosService.obtenerVistasProyecto(idProyecto);
       return res.status(HttpStatus.OK).json({ ok: true, vistas });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  
+  @Post('users/:userId/favorites/:projectId')
+  async agregarProyectoAFavoritos(
+    @Param('userId') userId: string,
+    @Param('projectId') projectId: string,
+    @Res() res
+  ) {
+    try {
+      const user = await this.procesosService.agregarProyectoAFavoritos(userId, projectId);
+      return res.status(HttpStatus.OK).json({ ok: true, user });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Delete('users/:userId/favorites/:projectId')
+  async eliminarProyectoDeFavoritos(
+    @Param('userId') userId: string,
+    @Param('projectId') projectId: string,
+    @Res() res
+  ) {
+    try {
+      const user = await this.procesosService.eliminarProyectoDeFavoritos(userId, projectId);
+      return res.status(HttpStatus.OK).json({ ok: true, user });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Get('users/:userId/favorites')
+  async obtenerProyectosFavoritos(
+    @Param('userId') userId: string,
+    @Res() res
+  ) {
+    try {
+      const favoritos = await this.procesosService.obtenerProyectosFavoritos(userId);
+      return res.status(HttpStatus.OK).json({ ok: true, favoritos });
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
     }

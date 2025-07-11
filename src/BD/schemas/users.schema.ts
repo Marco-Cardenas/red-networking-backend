@@ -29,6 +29,10 @@ export class User {
   @Prop({default: ''})
   role: string;
 
+
+  @Prop({ type: [{ type: 'ObjectId', ref: 'projects' }], default: [] })
+  favorites: string[];
+
   @Prop({type:[String], default: ''})
   links: string[];
 

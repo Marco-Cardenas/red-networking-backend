@@ -199,4 +199,30 @@ export class ProcesosService {
     return proyecto.vistas || 0;
   }
 
+
+
+  async agregarProyectoAFavoritos(userId: string, projectId: string) {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favorites: projectId } },
+      { new: true }
+    );
+  }
+
+  async eliminarProyectoDeFavoritos(userId: string, projectId: string) {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { favorites: projectId } },
+      { new: true }
+    );
+  }
+
+  async obtenerProyectosFavoritos(userId: string) {
+    const user = await this.userModel.findById(userId).populate({
+      path: 'favorites',
+      select: '_id title repositoryLink'
+    });
+    return user ? user.favorites : [];
+  }
+
 }
