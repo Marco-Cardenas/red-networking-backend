@@ -14,11 +14,14 @@ export class AuthController {
     if (!user) {
       return respuesta.status(HttpStatus.OK).json({  proceso: false, message: 'Credenciales inválidas' });
     }
-    const token = await this.authService.verifyFromBD(user);
+    const info = await this.authService.verifyFromBD(user._doc);
     return respuesta.status(HttpStatus.OK).json({
       proceso: true,
       message: 'Inicio de sesión exitoso',
-      token: token
+      token: info.token,
+      id: user._doc._id,
+      name: user._doc.name,
+      email: user._doc.email
     });
   }
 
