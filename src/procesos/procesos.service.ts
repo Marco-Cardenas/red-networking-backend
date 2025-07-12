@@ -227,4 +227,28 @@ export class ProcesosService {
     return user ? user.favorites : [];
   }
 
+  async cambiarRolUsuario(userId: string, nuevoRol: string) {
+    // Validar que el rol sea válido
+    const rolesValidos = ['admin', 'estudiante', 'profesor'];
+    if (!rolesValidos.includes(nuevoRol)) {
+      throw new Error('Rol no válido. Los roles permitidos son: admin, estudiante, profesor');
+    }
+
+    // Buscar y actualizar el usuario
+    const usuario = await this.userModel.findByIdAndUpdate(
+      userId,
+      { 
+        role: nuevoRol,
+        updatedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!usuario) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    return { message: 'Rol actualizado correctamente' };
+  }
+
 }

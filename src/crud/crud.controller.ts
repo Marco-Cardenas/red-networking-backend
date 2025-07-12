@@ -248,4 +248,28 @@ export class CrudController {
     }
   }
 
+  @Post('users/:userId/cambiar-rol')
+  async cambiarRolUsuario(
+    @Param('userId') userId: string,
+    @Body('rol') nuevoRol: string,
+    @Res() res
+  ) {
+    try {
+      if (!nuevoRol) {
+        return res.status(HttpStatus.BAD_REQUEST).json({ 
+          ok: false, 
+          error: 'El campo "rol" es requerido' 
+        });
+      }
+
+      const resultado = await this.procesosService.cambiarRolUsuario(userId, nuevoRol);
+      return res.status(HttpStatus.OK).json({ 
+        ok: true, 
+        message: resultado.message + " " + nuevoRol
+      });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }
