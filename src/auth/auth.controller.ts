@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, HttpStatus, Get } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from '../dtos/login.dto';
@@ -45,7 +45,25 @@ export class AuthController {
     const users = await this.authService.getUser();
     return respuesta.status(HttpStatus.OK).json({
       proceso: true,
-      users,
+      users
     });
+  }
+
+  @Put('change_password') //Le debe llegar el email y el password
+  async change_password(@Res() respuesta, @Body() inputData) {
+    const users = await this.authService.getUser({email: inputData.email});
+    if(users.length == 0) {
+      return respuesta.status(HttpStatus.OK).json({
+        process: false,
+        message: "No se pudo cambiar la clave debido a: Usuario no registrado"
+      });
+    }
+    inputData.password = await bcrypt.hash(inputData.password, 4);
+    await this.authService.changePasword(users[0]._id, inputData.password);
+    return respuesta.status(HttpStatus.OK).json({
+      process: true,
+      message: "Clave cambiada correctamente"
+    });
+
   }
 }

@@ -25,9 +25,14 @@ export class AuthService {
     return await newUser.save();
   }
 
-  async getUser() {
-    const users = await this.userModel.find();
+  async getUser(opt = {}) {
+    const users = await this.userModel.find(opt);
     return users;
+  }
+
+  async changePasword(userID, newPassword) {
+    const user = await this.userModel.findByIdAndUpdate(userID, {password: newPassword}, { new: true });
+    return user;
   }
 
   async validateUser(email: string, password: string): Promise<any> {
