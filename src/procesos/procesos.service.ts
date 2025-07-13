@@ -357,6 +357,33 @@ export class ProcesosService {
   async eliminarUsuario(userId: string, admin: string) {
     const user = await this.getUser(admin);
     if (user && user.role == 'admin') {
+      // Obtener el usuario antes de eliminarlo para verificar su rol
+      const usuarioAEliminar = await this.userModel.findById(userId);
+      if (!usuarioAEliminar) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      // Eliminar todos los proyectos donde el usuario sea autor
+      const proyectosDelUsuario = await this.projectModel.find({
+        authors: userId,
+      });
+      
+      for (const proyecto of proyectosDelUsuario) {
+        // Eliminar todos los comentarios del proyecto
+        await this.commentModel.deleteMany({ projectID: proyecto._id });
+        // Eliminar el proyecto
+        await this.projectModel.findByIdAndDelete(proyecto._id);
+      }
+
+      // Eliminar todos los comentarios del usuario
+      await this.commentModel.deleteMany({ authorID: userId });
+
+      // Si el usuario es profesor, eliminar todas sus calificaciones
+      if (usuarioAEliminar.role === 'profesor') {
+        await this.ratingModel.deleteMany({ teacherID: userId });
+      }
+
+      // Finalmente eliminar el usuario
       const usuario = await this.userModel.findByIdAndDelete(userId);
       return usuario;
     }
