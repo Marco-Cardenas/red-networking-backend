@@ -20,13 +20,13 @@ export class ProcesosService {
     @InjectModel('projects') private readonly projectModel: Model<Project>,
     @InjectModel('comments') private readonly commentModel: Model<Comment>,
     @InjectModel('badges') private readonly badgeModel: Model<Badge>,
-    @InjectModel('aireviews') private readonly aiReviewModel: Model<AIReview>
-
-  ) { }
+    @InjectModel('aireviews') private readonly aiReviewModel: Model<AIReview>,
+  ) {}
   async pagina_principal(paginationDto: PaginationDto) {
     try {
       const { limit, page, search } = paginationDto;
-      const baseUrl = 'https://red-networking-backend.vercel.app/api/pagina_principal';
+      const baseUrl =
+        'https://red-networking-backend.vercel.app/api/pagina_principal';
       const totalPages = await this.projectModel.countDocuments();
       const next_page_url = `${baseUrl}?page=${page + 1}`;
       const prev = page - 1;
@@ -34,7 +34,8 @@ export class ProcesosService {
 
       return {
         data: {
-          data: await this.projectModel.find()
+          data: await this.projectModel
+            .find()
             .sort({ createdAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit),
@@ -42,19 +43,18 @@ export class ProcesosService {
           current_page: page,
           last_page: Math.ceil(totalPages / limit),
           next_page_url,
-          prev_page_url
+          prev_page_url,
         },
-        operation: true
+        operation: true,
       };
     } catch (error) {
       console.log(error);
       return {
         message: 'Error Interno',
         operation: false,
-        data: null
-      }
+        data: null,
+      };
     }
-
   }
 
   async crearProyecto(data: any) {
@@ -77,7 +77,7 @@ export class ProcesosService {
     return this.projectModel.findByIdAndUpdate(
       idProyecto,
       { $push: { puntuacion } },
-      { new: true }
+      { new: true },
     );
   }
 
@@ -91,7 +91,6 @@ export class ProcesosService {
   }
 
   async agregarComentario(idProyecto: string, data: any) {
-
     const nuevoComentario = await this.commentModel.create({
       ...data,
       projectID: idProyecto,
@@ -100,17 +99,16 @@ export class ProcesosService {
       likes: [],
     });
 
-    await this.projectModel.findByIdAndUpdate(
-      idProyecto,
-      { $push: { comments: nuevoComentario._id } }
-    );
+    await this.projectModel.findByIdAndUpdate(idProyecto, {
+      $push: { comments: nuevoComentario._id },
+    });
     return nuevoComentario;
   }
 
   async obtenerProyectosPorUsuario(userId: string) {
     return this.projectModel.find(
       { authors: userId },
-      { _id: 1, title: 1, repositoryLink: 1 , description: 1, tools: 1}
+      { _id: 1, title: 1, repositoryLink: 1, description: 1, tools: 1 },
     );
   }
 
@@ -119,14 +117,15 @@ export class ProcesosService {
       // Obtener todos los proyectos con sus puntuaciones
       const proyectos = await this.projectModel.find();
       // Calcular la suma de puntuaciones para cada proyecto y ordenar
-      const proyectosConPuntuacion = proyectos.map(proyecto => {
-        const sumaPuntuacion = proyecto.puntuacion && proyecto.puntuacion.length > 0
-          ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0)
-          : 0;
+      const proyectosConPuntuacion = proyectos.map((proyecto) => {
+        const sumaPuntuacion =
+          proyecto.puntuacion && proyecto.puntuacion.length > 0
+            ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0)
+            : 0;
 
         return {
           ...proyecto.toObject(),
-          sumaPuntuacion
+          sumaPuntuacion,
         };
       });
 
@@ -137,27 +136,28 @@ export class ProcesosService {
 
       return {
         data: top10Proyectos,
-        operation: true
+        operation: true,
       };
     } catch (error) {
       console.log(error);
       return {
         message: 'Error Interno',
         operation: false,
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
   async obtenerComentariosProyecto(idProyecto: string) {
-    const proyecto = await this.projectModel.findById(idProyecto).populate('comments');
+    const proyecto = await this.projectModel
+      .findById(idProyecto)
+      .populate('comments');
     return proyecto ? proyecto.comments : [];
   }
 
   async obtenerProyecto(id: string) {
     return this.projectModel.findById(id);
   }
-
 
   async agregarLikeComentario(idComentario: string, idUsuario: string) {
     const comentario = await this.commentModel.findById(idComentario);
@@ -167,7 +167,9 @@ export class ProcesosService {
     // Verificar si el usuario ya ha dado like
     if (comentario.likes.includes(idUsuario)) {
       // Si ya ha dado like, eliminarlo
-      comentario.likes = comentario.likes.filter(userId => userId !== idUsuario);
+      comentario.likes = comentario.likes.filter(
+        (userId) => userId !== idUsuario,
+      );
     } else {
       // Si no ha dado like, agregarlo
       comentario.likes.push(idUsuario);
@@ -201,18 +203,16 @@ export class ProcesosService {
     return proyecto.vistas || 0;
   }
 
-
-
   async agregarProyectoAFavoritos(userId: string, projectId: string) {
     await this.userModel.findByIdAndUpdate(
       userId,
       { $addToSet: { favorites: projectId } },
-      { new: true }
+      { new: true },
     );
     await this.projectModel.findByIdAndUpdate(
       projectId,
       { $inc: { favoritos: 1 } },
-      { new: true }
+      { new: true },
     );
     return { message: 'agregado a favoritos' };
   }
@@ -221,31 +221,31 @@ export class ProcesosService {
     await this.userModel.findByIdAndUpdate(
       userId,
       { $pull: { favorites: projectId } },
-      { new: true }
+      { new: true },
     );
     await this.projectModel.findByIdAndUpdate(
       projectId,
       { $inc: { favoritos: -1 } },
-      { new: true }
+      { new: true },
     );
-    
+
     // Verificar que el número de favoritos no sea menor a 0
     const proyecto = await this.projectModel.findById(projectId);
     if (proyecto && proyecto.favoritos < 0) {
       await this.projectModel.findByIdAndUpdate(
         projectId,
         { favoritos: 0 },
-        { new: true }
+        { new: true },
       );
     }
-    
+
     return { message: 'eliminado de favoritos' };
   }
 
   async obtenerProyectosFavoritos(userId: string) {
     const user = await this.userModel.findById(userId).populate({
       path: 'favorites',
-      select: '_id title repositoryLink'
+      select: '_id title repositoryLink',
     });
     return user ? user.favorites : [];
   }
@@ -254,7 +254,9 @@ export class ProcesosService {
     // Validar que el rol sea válido
     const rolesValidos = ['admin', 'estudiante', 'profesor'];
     if (!rolesValidos.includes(nuevoRol)) {
-      throw new Error('Rol no válido. Los roles permitidos son: admin, estudiante, profesor');
+      throw new Error(
+        'Rol no válido. Los roles permitidos son: admin, estudiante, profesor',
+      );
     }
 
     // Buscar y actualizar el usuario
@@ -262,9 +264,9 @@ export class ProcesosService {
       userId,
       {
         role: nuevoRol,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      { new: true }
+      { new: true },
     );
 
     if (!usuario) {
@@ -274,25 +276,36 @@ export class ProcesosService {
     return { message: 'Rol actualizado correctamente' };
   }
 
-
   async generarResumen(id: string) {
-    const proyecto = await this.obtenerProyecto(id)
+    const proyecto = await this.obtenerProyecto(id);
     const comentarios = await this.obtenerComentariosProyecto(id);
-    const contenidoComentarios = comentarios.map(comentario => comentario.content);
+    const contenidoComentarios = comentarios.map(
+      (comentario) => comentario.content,
+    );
     let mjs = '';
-    if(proyecto){
-      mjs = "Elabora un analis sobre el siguiente proyecto: " + proyecto.title + " cuya descripcion es la siguiente: " +proyecto.description;
+    if (proyecto) {
+      mjs =
+        'Elabora un analis sobre el siguiente proyecto: ' +
+        proyecto.title +
+        ' cuya descripcion es la siguiente: ' +
+        proyecto.description;
 
-      if(proyecto.tools.length > 0){
-        mjs+= ' Este proyecto esta realizado con las siguientes tegnologias: ' + proyecto.tools.join(', ');
+      if (proyecto.tools.length > 0) {
+        mjs +=
+          ' Este proyecto esta realizado con las siguientes tegnologias: ' +
+          proyecto.tools.join(', ');
       }
 
-      if(contenidoComentarios.length > 0){
-        mjs+= " Ademas el proyecto cuenta con las siguientes reseñas: " +contenidoComentarios.join(', ')
+      if (contenidoComentarios.length > 0) {
+        mjs +=
+          ' Ademas el proyecto cuenta con las siguientes reseñas: ' +
+          contenidoComentarios.join(', ');
       }
 
-      if(proyecto.puntuacion.length > 0){
-        mjs+= " Y tiene las siguientes calificaciones: " +proyecto.puntuacion.join(', ');
+      if (proyecto.puntuacion.length > 0) {
+        mjs +=
+          ' Y tiene las siguientes calificaciones: ' +
+          proyecto.puntuacion.join(', ');
       }
       console.log(mjs);
     }
@@ -306,27 +319,33 @@ export class ProcesosService {
             {
               parts: [
                 {
-                  text: mjs
-                }
-              ]
-            }
-          ]
+                  text: mjs,
+                },
+              ],
+            },
+          ],
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            'X-goog-api-key': 'AIzaSyDNxTa2cYObgy65OHFlJNQAV_R4hS2Pl0c'
+            'X-goog-api-key': 'AIzaSyDNxTa2cYObgy65OHFlJNQAV_R4hS2Pl0c',
           },
-          timeout: 30000
-        }
+          timeout: 30000,
+        },
       );
-      return { 
-        success: true, 
-        response: response.data.candidates[0].content.parts[0].text 
+      return {
+        success: true,
+        response: response.data.candidates[0].content.parts[0].text,
       };
     } catch (error) {
-      console.error('Error llamando a la IA:', error?.response?.data || error.message);
-      return { error: 'No se pudo obtener respuesta de la IA', detalle: error?.response?.data || error.message };
+      console.error(
+        'Error llamando a la IA:',
+        error?.response?.data || error.message,
+      );
+      return {
+        error: 'No se pudo obtener respuesta de la IA',
+        detalle: error?.response?.data || error.message,
+      };
     }
   }
 
@@ -336,19 +355,17 @@ export class ProcesosService {
   }
 
   async eliminarUsuario(userId: string, admin: string) {
-
     const user = await this.getUser(admin);
-    if(user && user.role == 'admin'){
+    if (user && user.role == 'admin') {
       const usuario = await this.userModel.findByIdAndDelete(userId);
       return usuario;
     }
     throw new Error('No tienes permisos para eliminar usuarios');
-   
   }
 
   async eliminarProyecto(id: string, admin: string) {
     const user = await this.getUser(admin);
-    if(user && user.role == 'admin'){
+    if (user && user.role == 'admin') {
       const proyecto = await this.projectModel.findByIdAndDelete(id);
       return proyecto;
     }
@@ -357,18 +374,24 @@ export class ProcesosService {
 
   async eliminarComentario(id: string, admin: string) {
     const user = await this.getUser(admin);
-    if(user && user.role == 'admin'){
+    if (user && user.role == 'admin') {
       const comentario = await this.commentModel.findByIdAndDelete(id);
-      if(comentario){
-        await this.projectModel.findByIdAndUpdate(comentario.projectID, { $pull: { comments: comentario._id } });
+      if (comentario) {
+        await this.projectModel.findByIdAndUpdate(comentario.projectID, {
+          $pull: { comments: comentario._id },
+        });
       }
       return comentario;
     }
     throw new Error('No tienes permisos para eliminar comentarios');
   }
 
-
-  async evaluarProyectos(data: { projectID: string, teacherID: string, score: number, feedback: string }) {
+  async evaluarProyectos(data: {
+    projectID: string;
+    teacherID: string;
+    score: number;
+    feedback: string;
+  }) {
     // Verifica que el usuario sea profesor
     const profesor = await this.userModel.findById(data.teacherID);
     if (!profesor || profesor.role !== 'profesor') {
@@ -381,11 +404,10 @@ export class ProcesosService {
       score: data.score,
       feedback: data.feedback,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     return nuevaEvaluacion.save();
   }
-
 
   async obtenerEvaluacionesPorProfesor(teacherID: string) {
     return this.ratingModel.find({ teacherID });
@@ -393,10 +415,20 @@ export class ProcesosService {
 
   async obtenerPromedioEvaluacionesPorProyecto(projectID: string) {
     const evaluaciones = await this.ratingModel.find({ projectID });
-    if(evaluaciones.length === 0){
+    if (evaluaciones.length === 0) {
       return 0;
     }
     const suma = evaluaciones.reduce((acc, val) => acc + val.score, 0);
     return suma / evaluaciones.length;
+  }
+  async getRatingByProjectAndTeacher(
+    projectID: string,
+    teacherID: string,
+  ): Promise<Rating | null> {
+    if (!projectID || !teacherID) {
+      throw new Error('ProjectID and TeacherID are required');
+    }
+
+    return this.ratingModel.findOne({ teacherID, projectID }).exec();
   }
 }
