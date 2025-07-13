@@ -340,4 +340,27 @@ export class CrudController {
     }
   }
 
+  @Post('projects/evaluacion')
+  async evaluarProyecto(@Body() body, @Res() res) {
+    try {
+      const evaluacion = await this.procesosService.evaluarProyectos(body);
+      return res.status(201).json({ ok: true, evaluacion });
+    } catch (error) {
+      return res.status(400).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Get('projects/evaluacion/:teacherID')
+  async obtenerEvaluacionesPorProfesor(
+    @Param('teacherID') teacherID: string,
+    @Res() res
+  ) {
+    try {
+      const evaluaciones = await this.procesosService.obtenerEvaluacionesPorProfesor(teacherID);
+      return res.status(HttpStatus.OK).json({ ok: true, evaluaciones });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }

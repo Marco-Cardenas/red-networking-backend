@@ -366,4 +366,28 @@ export class ProcesosService {
     }
     throw new Error('No tienes permisos para eliminar comentarios');
   }
+
+
+  async evaluarProyectos(data: { projectID: string, teacherID: string, score: number, feedback: string }) {
+    // Verifica que el usuario sea profesor
+    const profesor = await this.userModel.findById(data.teacherID);
+    if (!profesor || profesor.role !== 'profesor') {
+      throw new Error('Solo los profesores pueden evaluar proyectos');
+    }
+    // Crea la evaluación (rating)
+    const nuevaEvaluacion = new this.ratingModel({
+      projectID: data.projectID,
+      teacherID: data.teacherID,
+      score: data.score,
+      feedback: data.feedback,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    return nuevaEvaluacion.save();
+  }
+
+
+  async obtenerEvaluacionesPorProfesor(teacherID: string) {
+    return this.ratingModel.find({ teacherID });
+  }
 }
