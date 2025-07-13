@@ -309,5 +309,40 @@ export class ProcesosService {
     }
   }
 
+  async obtenerUsuarios() {
+    const usuarios = await this.userModel.find();
+    return usuarios;
+  }
 
+  async eliminarUsuario(userId: string, admin: string) {
+
+    const user = await this.getUser(admin);
+    if(user && user.role == 'admin'){
+      const usuario = await this.userModel.findByIdAndDelete(userId);
+      return usuario;
+    }
+    throw new Error('No tienes permisos para eliminar usuarios');
+   
+  }
+
+  async eliminarProyecto(id: string, admin: string) {
+    const user = await this.getUser(admin);
+    if(user && user.role == 'admin'){
+      const proyecto = await this.projectModel.findByIdAndDelete(id);
+      return proyecto;
+    }
+    throw new Error('No tienes permisos para eliminar proyectos');
+  }
+
+  async eliminarComentario(id: string, admin: string) {
+    const user = await this.getUser(admin);
+    if(user && user.role == 'admin'){
+      const comentario = await this.commentModel.findByIdAndDelete(id);
+      if(comentario){
+        await this.projectModel.findByIdAndUpdate(comentario.projectID, { $pull: { comments: comentario._id } });
+      }
+      return comentario;
+    }
+    throw new Error('No tienes permisos para eliminar comentarios');
+  }
 }

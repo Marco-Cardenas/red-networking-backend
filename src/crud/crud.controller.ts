@@ -277,14 +277,67 @@ export class CrudController {
     @Param('id') id: string,
     @Res() res
   ) {
-    //try {
+    try {
       const resumen = await this.procesosService.generarResumen(id);
       return res.status(HttpStatus.OK).json({ ok: true, resumen });
 
-
-   /* } catch (error) {
+    } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
-    }*/
+    }
+  }
+
+  @Get('users')
+  async obtenerUsuarios(
+    @Res() res
+  ) {
+    try {
+      const usuarios = await this.procesosService.obtenerUsuarios();
+      return res.status(HttpStatus.OK).json({ ok: true, usuarios });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Delete('user/:userId/:admin')
+  async eliminarUsuario(
+    @Param('userId') userId: string,
+    @Param('admin') admin: string,
+    @Res() res
+  ) {
+    try {
+      const usuario = await this.procesosService.eliminarUsuario(userId, admin);
+      return res.status(HttpStatus.OK).json({ ok: true, usuario });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Delete('project/:id/:admin')
+  async eliminarProyecto(
+    @Param('id') id: string,
+    @Param('admin') admin: string,
+    @Res() res
+  ) {
+    try {
+      const proyecto = await this.procesosService.eliminarProyecto(id, admin);
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+  @Delete('comment/:id/:admin')
+  async eliminarComentario(
+    @Param('id') id: string,
+    @Param('admin') admin: string,
+    @Res() res
+  ) {
+    try {
+      const comentario = await this.procesosService.eliminarComentario(id, admin);
+      return res.status(HttpStatus.OK).json({ ok: true, comentario });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
   }
 
 }
