@@ -4,12 +4,12 @@ import { PaginationDto } from '../dtos/paginate.dto';
 
 @Controller('api')
 export class CrudController {
-  constructor(private readonly procesosService: ProcesosService) {}
+  constructor(private readonly procesosService: ProcesosService) { }
 
   @Get('pagina_principal')
   async pagina_principal(@Res() respuesta, @Query() paginationDto: PaginationDto) {
     const data = await this.procesosService.pagina_principal(paginationDto);
-    if(!data.operation){
+    if (!data.operation) {
       return respuesta.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         proceso: false,
@@ -52,7 +52,7 @@ export class CrudController {
     }
   }
 
-  
+
 
   @Post('projects/:id/agregar-puntuacion')
   async agregarPuntuacion(
@@ -61,7 +61,7 @@ export class CrudController {
     @Res() res
   ) {
     if (typeof puntuacion !== 'number' || puntuacion < 1 || puntuacion > 5) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: 'La puntuación debe ser un número entre 1 y 5' });
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: 'La puntuación debe ser un número entre 1 y 5' });
     }
     try {
       const proyectoActualizado = await this.procesosService.agregarPuntuacion(id, puntuacion);
@@ -80,7 +80,7 @@ export class CrudController {
     });
   }
 
-  @Get('projects/:id') 
+  @Get('projects/:id')
   async obtenerProyectoPorId(
     @Param('id') id: string,
     @Res() res
@@ -126,11 +126,11 @@ export class CrudController {
   @Get('ranking')
   async ranking(@Res() respuesta) {
     const data = await this.procesosService.ranking();
-    if(!data.operation){
+    if (!data.operation) {
       return respuesta.status(HttpStatus.BAD_REQUEST).json({
         data: null,
         proceso: false,
-       message: data.message
+        message: data.message
       });
     }
     return respuesta.status(HttpStatus.OK).json({
@@ -181,7 +181,7 @@ export class CrudController {
 
 
   @Post('projects/:idProyecto/sumar-vistas')
-  async sumarVistasProyecto( 
+  async sumarVistasProyecto(
     @Param('idProyecto') idProyecto: string,
     @Res() res
   ) {
@@ -194,7 +194,7 @@ export class CrudController {
   }
 
   @Get('projects/:idProyecto/vistas')
-  async obtenerVistasProyecto( 
+  async obtenerVistasProyecto(
     @Param('idProyecto') idProyecto: string,
     @Res() res
   ) {
@@ -206,7 +206,7 @@ export class CrudController {
     }
   }
 
-  
+
   @Post('users/:userId/favorites/:projectId')
   async agregarProyectoAFavoritos(
     @Param('userId') userId: string,
@@ -256,20 +256,35 @@ export class CrudController {
   ) {
     try {
       if (!nuevoRol) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ 
-          ok: false, 
-          error: 'El campo "rol" es requerido' 
+        return res.status(HttpStatus.BAD_REQUEST).json({
+          ok: false,
+          error: 'El campo "rol" es requerido'
         });
       }
 
       const resultado = await this.procesosService.cambiarRolUsuario(userId, nuevoRol);
-      return res.status(HttpStatus.OK).json({ 
-        ok: true, 
+      return res.status(HttpStatus.OK).json({
+        ok: true,
         message: resultado.message + " " + nuevoRol
       });
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
     }
+  }
+
+  @Get('resumen-ia/:id')
+  async generateResumen(
+    @Param('id') id: string,
+    @Res() res
+  ) {
+    //try {
+      const resumen = await this.procesosService.generarResumen(id);
+      return res.status(HttpStatus.OK).json({ ok: true, resumen });
+
+
+   /* } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }*/
   }
 
 }

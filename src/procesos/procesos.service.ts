@@ -9,6 +9,7 @@ import { Comment } from '../BD/schemas/comments.schema';
 import { Badge } from '../BD/schemas/badges.schema';
 import { AIReview } from '../BD/schemas/ai_review.schema';
 import { PaginationDto } from '../dtos/paginate.dto';
+import axios from 'axios';
 
 @Injectable()
 export class ProcesosService {
@@ -119,10 +120,10 @@ export class ProcesosService {
       const proyectos = await this.projectModel.find();
       // Calcular la suma de puntuaciones para cada proyecto y ordenar
       const proyectosConPuntuacion = proyectos.map(proyecto => {
-        const sumaPuntuacion = proyecto.puntuacion && proyecto.puntuacion.length > 0 
-          ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0) 
+        const sumaPuntuacion = proyecto.puntuacion && proyecto.puntuacion.length > 0
+          ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0)
           : 0;
-        
+
         return {
           ...proyecto.toObject(),
           sumaPuntuacion
@@ -154,7 +155,7 @@ export class ProcesosService {
   }
 
   async obtenerProyecto(id: string) {
-  return this.projectModel.findById(id);
+    return this.projectModel.findById(id);
   }
 
 
@@ -238,7 +239,7 @@ export class ProcesosService {
     // Buscar y actualizar el usuario
     const usuario = await this.userModel.findByIdAndUpdate(
       userId,
-      { 
+      {
         role: nuevoRol,
         updatedAt: new Date()
       },
@@ -251,5 +252,62 @@ export class ProcesosService {
 
     return { message: 'Rol actualizado correctamente' };
   }
+
+
+  async generarResumen(id: string) {
+    const proyecto = await this.obtenerProyecto(id)
+    const comentarios = await this.obtenerComentariosProyecto(id);
+    const contenidoComentarios = comentarios.map(comentario => comentario.content);
+    let mjs = '';
+    if(proyecto){
+      mjs = "Elabora un analis sobre el siguiente proyecto: " + proyecto.title + " cuya descripcion es la siguiente: " +proyecto.description;
+
+      if(proyecto.tools.length > 0){
+        mjs+= ' Este proyecto esta realizado con las siguientes tegnologias: ' + proyecto.tools.join(', ');
+      }
+
+      if(contenidoComentarios.length > 0){
+        mjs+= " Ademas el proyecto cuenta con las siguientes reseñas: " +contenidoComentarios.join(', ')
+      }
+
+      if(proyecto.puntuacion.length > 0){
+        mjs+= " Y tiene las siguientes calificaciones: " +proyecto.puntuacion.join(', ');
+      }
+      console.log(mjs);
+    }
+
+    // Llamada a la API de Google Gemini (gratuita)
+    try {
+      const response = await axios.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+        {
+          contents: [
+            {
+              parts: [
+                {
+                  text: mjs
+                }
+              ]
+            }
+          ]
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': 'AIzaSyDNxTa2cYObgy65OHFlJNQAV_R4hS2Pl0c'
+          },
+          timeout: 30000
+        }
+      );
+      return { 
+        success: true, 
+        response: response.data.candidates[0].content.parts[0].text 
+      };
+    } catch (error) {
+      console.error('Error llamando a la IA:', error?.response?.data || error.message);
+      return { error: 'No se pudo obtener respuesta de la IA', detalle: error?.response?.data || error.message };
+    }
+  }
+
 
 }
