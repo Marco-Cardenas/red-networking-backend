@@ -21,7 +21,8 @@ export class AuthController {
       token: info.token,
       id: user._doc._id,
       name: user._doc.name,
-      email: user._doc.email
+      email: user._doc.email,
+      role: user._doc.role
     });
   }
 
