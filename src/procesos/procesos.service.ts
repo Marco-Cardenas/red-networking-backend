@@ -209,6 +209,11 @@ export class ProcesosService {
       { $addToSet: { favorites: projectId } },
       { new: true }
     );
+    await this.projectModel.findByIdAndUpdate(
+      projectId,
+      { $inc: { favoritos: 1 } },
+      { new: true }
+    );
     return { message: 'agregado a favoritos' };
   }
 
@@ -218,6 +223,22 @@ export class ProcesosService {
       { $pull: { favorites: projectId } },
       { new: true }
     );
+    await this.projectModel.findByIdAndUpdate(
+      projectId,
+      { $inc: { favoritos: -1 } },
+      { new: true }
+    );
+    
+    // Verificar que el número de favoritos no sea menor a 0
+    const proyecto = await this.projectModel.findById(projectId);
+    if (proyecto && proyecto.favoritos < 0) {
+      await this.projectModel.findByIdAndUpdate(
+        projectId,
+        { favoritos: 0 },
+        { new: true }
+      );
+    }
+    
     return { message: 'eliminado de favoritos' };
   }
 
