@@ -363,4 +363,18 @@ export class CrudController {
     }
   }
 
+  @Get('projects/evaluacion/promedio/:projectID')
+  async obtenerPromedioEvaluacionesPorProyecto(
+    @Param('projectID') projectID: string,
+    @Res() res
+  ) {
+    try {
+      const promedio = await this.procesosService.obtenerPromedioEvaluacionesPorProyecto(projectID);  
+      return res.status(HttpStatus.OK).json({ ok: true, promedio });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
+
 }

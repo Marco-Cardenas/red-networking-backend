@@ -110,7 +110,7 @@ export class ProcesosService {
   async obtenerProyectosPorUsuario(userId: string) {
     return this.projectModel.find(
       { authors: userId },
-      { _id: 1, title: 1, repositoryLink: 1 }
+      { _id: 1, title: 1, repositoryLink: 1 , description: 1, tools: 1}
     );
   }
 
@@ -368,5 +368,14 @@ export class ProcesosService {
 
   async obtenerEvaluacionesPorProfesor(teacherID: string) {
     return this.ratingModel.find({ teacherID });
+  }
+
+  async obtenerPromedioEvaluacionesPorProyecto(projectID: string) {
+    const evaluaciones = await this.ratingModel.find({ projectID });
+    if(evaluaciones.length === 0){
+      return 0;
+    }
+    const suma = evaluaciones.reduce((acc, val) => acc + val.score, 0);
+    return suma / evaluaciones.length;
   }
 }
