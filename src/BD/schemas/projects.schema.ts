@@ -40,6 +40,9 @@ export class Project {
 
   @Prop({default: '' })
   vistas: number;
+
+  @Prop({default: 0})
+  favoritos: number;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
