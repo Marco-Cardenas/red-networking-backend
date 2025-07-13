@@ -449,4 +449,74 @@ export class ProcesosService {
     }
     throw new Error('No tienes permisos para eliminar este comentario');
   }
+
+  async actualizarPerfilUsuario(
+    userId: string,
+    profileData: {
+      name?: string;
+      email?: string;
+      bio?: string;
+      website?: string;
+      github?: string;
+    },
+  ) {
+    // Verificar que el usuario existe
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    // Preparar los datos de actualización
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    // Actualizar campos directos si están presentes
+    if (profileData.name !== undefined) {
+      updateData.name = profileData.name;
+    }
+    if (profileData.email !== undefined) {
+      updateData.email = profileData.email;
+    }
+    if (profileData.bio !== undefined) {
+      updateData.bio = profileData.bio;
+    }
+
+    // Preparar el array de links
+    const links = [...(user.links || [])];
+    
+    // Si se proporciona website, agregarlo o actualizarlo en la posición 0
+    if (profileData.website !== undefined) {
+      if (links.length > 0) {
+        links[0] = profileData.website;
+      } else {
+        links.push(profileData.website);
+      }
+    }
+    
+    // Si se proporciona github, agregarlo o actualizarlo en la posición 1
+    if (profileData.github !== undefined) {
+      if (links.length > 1) {
+        links[1] = profileData.github;
+      } else if (links.length === 1) {
+        links.push(profileData.github);
+      } else {
+        links.push('', profileData.github); // Agregar espacio vacío en posición 0 si no hay website
+      }
+    }
+
+    // Actualizar el array de links si hay cambios
+    if (profileData.website !== undefined || profileData.github !== undefined) {
+      updateData.links = links;
+    }
+
+    // Actualizar el usuario
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      updateData,
+      { new: true },
+    );
+
+    return updatedUser;
+  }
 }

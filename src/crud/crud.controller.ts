@@ -3,6 +3,7 @@ import {
   Post,
   Get,
   Delete,
+  Put,
   Body,
   Res,
   HttpStatus,
@@ -506,6 +507,31 @@ export class CrudController {
         userId,
       );
       return res.status(HttpStatus.OK).json({ ok: true, comentario });
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ ok: false, error: error.message });
+    }
+  }
+
+  @Put('users/:userId/profile')
+  async actualizarPerfilUsuario(
+    @Param('userId') userId: string,
+    @Body() profileData: {
+      name?: string;
+      email?: string;
+      bio?: string;
+      website?: string;
+      github?: string;
+    },
+    @Res() res,
+  ) {
+    try {
+      const user = await this.procesosService.actualizarPerfilUsuario(
+        userId,
+        profileData,
+      );
+      return res.status(HttpStatus.OK).json({ ok: true, user });
     } catch (error) {
       return res
         .status(HttpStatus.BAD_REQUEST)
