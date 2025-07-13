@@ -474,4 +474,42 @@ export class CrudController {
         .json({ ok: false, error: error.message });
     }
   }
+
+  @Delete('project-autor/:id/:userId')
+  async eliminarProyectoAutor(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Res() res,
+  ) {
+    try {
+      const proyecto = await this.procesosService.eliminarProyectoAutor(
+        id,
+        userId,
+      );
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto });
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ ok: false, error: error.message });
+    }
+  }
+
+  @Delete('comment-autor/:id/:userId')
+  async eliminarComentarioAutor(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Res() res,
+  ) {
+    try {
+      const comentario = await this.procesosService.eliminarComentarioAutor(
+        id,
+        userId,
+      );
+      return res.status(HttpStatus.OK).json({ ok: true, comentario });
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ ok: false, error: error.message });
+    }
+  }
 }

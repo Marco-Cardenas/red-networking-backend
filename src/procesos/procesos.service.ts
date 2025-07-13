@@ -431,4 +431,22 @@ export class ProcesosService {
 
     return this.ratingModel.findOne({ teacherID, projectID }).exec();
   }
+
+  async eliminarProyectoAutor(id: string, userId: string) {
+    const proyecto = await this.projectModel.findById(id);
+    if (proyecto && proyecto.authors.includes(userId)) {
+      await this.projectModel.findByIdAndDelete(id);
+      return proyecto;
+    }
+    throw new Error('No tienes permisos para eliminar este proyecto');
+  }
+
+  async eliminarComentarioAutor(id: string, userId: string) {
+    const comentario = await this.commentModel.findById(id);
+    if (comentario && comentario.authorID == userId) {
+      await this.commentModel.findByIdAndDelete(id);
+      return comentario;
+    }
+    throw new Error('No tienes permisos para eliminar este comentario');
+  }
 }
