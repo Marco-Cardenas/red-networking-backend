@@ -36,7 +36,7 @@ export class ProcesosService {
         data: {
           data: await this.projectModel
             .find()
-            .sort({ date: -1 })
+            .sort({ createAt: -1 })
             .skip((page - 1) * limit)
             .limit(limit),
           total: totalPages,

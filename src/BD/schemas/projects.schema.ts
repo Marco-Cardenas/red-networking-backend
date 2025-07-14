@@ -43,6 +43,9 @@ export class Project {
 
   @Prop({default: 0})
   favoritos: number;
+
+  @Prop({default: Date.now})
+  createAt: Date;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
