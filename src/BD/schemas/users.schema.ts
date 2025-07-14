@@ -26,7 +26,7 @@ export class User {
   @Prop({default: ''})
   career: string;
 
-  @Prop({default: ''})
+  @Prop({default: 'estudiante'})
   role: string;
 
 
