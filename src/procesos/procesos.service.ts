@@ -546,4 +546,20 @@ export class ProcesosService {
 
     return updatedUser;
   }
+
+  async obtenerEvaluacionesPorProyecto(projectID: string) {
+    try {
+      const evaluaciones = await this.ratingModel.find({ projectID })
+        .populate({
+          path: 'teacherID',
+          select: 'name',
+          model: 'users'
+        })
+        .sort({ createdAt: -1 });
+      
+      return evaluaciones;
+    } catch (error) {
+      throw new Error('Error al obtener las evaluaciones del proyecto');
+    }
+  }
 }

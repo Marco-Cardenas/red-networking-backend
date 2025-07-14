@@ -538,4 +538,24 @@ export class CrudController {
         .json({ ok: false, error: error.message });
     }
   }
+
+  @Get('projects/evaluaciones/:projectID')
+  async obtenerEvaluacionesPorProyecto(
+    @Param('projectID') projectID: string,
+    @Res() res
+  ) {
+    try {
+      const evaluaciones = await this.procesosService.obtenerEvaluacionesPorProyecto(projectID);
+      return res.status(HttpStatus.OK).json({ 
+        ok: true, 
+        evaluaciones 
+      });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ 
+        ok: false, 
+        error: error.message 
+      });
+    }
+  }
+
 }
