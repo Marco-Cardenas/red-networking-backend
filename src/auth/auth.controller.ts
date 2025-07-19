@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Res, HttpStatus, Get, Put } from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus, Get, Put, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from '../dtos/login.dto';
 import { RegisterDto } from '../dtos/register.dto';
+import { ForgotPasswordDto } from '../dtos/forgot-password.dto';
+import { ResetPasswordDto } from '../dtos/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -65,5 +67,53 @@ export class AuthController {
       message: "Clave cambiada correctamente"
     });
 
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Res() respuesta,@Body() forgotPasswordDto: ForgotPasswordDto) {
+
+
+    try{
+      const res = await this.authService.forgotPassword(forgotPasswordDto);
+      return respuesta.status(HttpStatus.OK).json({
+        proceso: true,
+        message: res.message
+      });
+    }catch(error){
+      if(error instanceof BadRequestException){
+        return respuesta.status(HttpStatus.OK).json({
+          proceso: false,
+          message: error.message
+        });
+      } 
+      return respuesta.status(HttpStatus.OK).json({
+        proceso: false,
+        message: 'Error al enviar el correo de recuperación de contraseña'
+      });
+    }
+  
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Res() respuesta, @Body() resetPasswordDto: ResetPasswordDto) {
+    try{
+      const res = await this.authService.resetPassword(resetPasswordDto);
+      return respuesta.status(HttpStatus.OK).json({
+        proceso: true,
+        message: res.message
+      });
+    }
+    catch(error){
+      if(error instanceof BadRequestException){
+        return respuesta.status(HttpStatus.OK).json({
+          proceso: false,
+          message: error.message
+        });
+      }
+      return respuesta.status(HttpStatus.OK).json({
+        proceso: false,
+        message: 'Error al restablecer la contraseña'
+      });
+    }
   }
 }

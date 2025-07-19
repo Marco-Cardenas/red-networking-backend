@@ -44,6 +44,12 @@ export class User {
 
   @Prop({default: Date.now})
   updatedAt: Date;
+
+  @Prop({
+    type: String,
+    index: true,
+    default: ''})
+  remember_token: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
