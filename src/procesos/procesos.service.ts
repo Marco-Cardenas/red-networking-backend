@@ -594,12 +594,6 @@ export class ProcesosService {
     // Eliminar todas las evaluaciones donde el usuario sea el profesor evaluador
     await this.ratingModel.deleteMany({ teacherID: userId });
 
-    // Eliminar todas las puntuaciones del usuario en proyectos (si existe)
-    await this.projectModel.updateMany(
-      { puntuacion: { $exists: true } },
-      { $pull: { puntuacion: { $in: [userId] } } }
-    );
-
     // Eliminar likes del usuario en comentarios
     await this.commentModel.updateMany(
       { likes: userId },
