@@ -570,4 +570,19 @@ export class CrudController {
     }
   }
 
+  @Put('update-project/:id/autor/:userId')
+  async editarProyecto(
+    @Param('id') id: string,
+    @Param('userId') userId: string,
+    @Body() updateData: any,
+    @Res() res,
+  ) {
+    try {
+      const proyecto = await this.procesosService.editarProyecto(id, userId, updateData);
+      return res.status(HttpStatus.OK).json({ ok: true, proyecto });
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ ok: false, error: error.message });
+    }
+  }
+
 }

@@ -675,5 +675,22 @@ export class ProcesosService {
     }
     return { message: 'Rankings creados para proyectos con nota > 0' };
   }
+
+  // Método para editar un proyecto solo si el userId es autor
+  async editarProyecto(idProyecto: string, userId: string, updateData: any) {
+    // Buscar el proyecto
+    const proyecto = await this.projectModel.findById(idProyecto);
+    if (!proyecto) {
+      throw new Error('Proyecto no encontrado');
+    }
+    // Verificar que el userId sea uno de los autores
+    if (!proyecto.authors.map(String).includes(String(userId))) {
+      throw new Error('No tienes permisos para editar este proyecto');
+    }
+    // Actualizar el proyecto
+    Object.assign(proyecto, updateData, { updatedAt: new Date() });
+    await proyecto.save();
+    return proyecto;
+  }
   
 }
