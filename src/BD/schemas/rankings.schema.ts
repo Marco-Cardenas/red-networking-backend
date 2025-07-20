@@ -6,8 +6,9 @@ export type RankingDocument = HydratedDocument<Ranking>;
 @Schema()
 export class Ranking {
 
-  @Prop({default:''})
-  userID: string;
+
+  @Prop({ type: [{ type: 'ObjectId', ref: 'projects' }], default: '' })
+  projectID: string;
 
   @Prop({default:''})
   averageScore: number;

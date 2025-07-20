@@ -21,7 +21,7 @@ export class ProcesosService {
     @InjectModel('comments') private readonly commentModel: Model<Comment>,
     @InjectModel('badges') private readonly badgeModel: Model<Badge>,
     @InjectModel('aireviews') private readonly aiReviewModel: Model<AIReview>,
-  ) {}
+  ) { }
   async pagina_principal(paginationDto: PaginationDto) {
     try {
       const { limit, page, search } = paginationDto;
@@ -31,7 +31,6 @@ export class ProcesosService {
       const next_page_url = `${baseUrl}?page=${page + 1}`;
       const prev = page - 1;
       const prev_page_url = `${baseUrl}?page=${prev < 1 ? null : prev}`;
-
       return {
         data: {
           data: await this.projectModel
@@ -74,11 +73,40 @@ export class ProcesosService {
   }
 
   async agregarPuntuacion(idProyecto: string, puntuacion: number) {
-    return this.projectModel.findByIdAndUpdate(
+    // Agregar la puntuación al proyecto
+    const proyectoActualizado = await this.projectModel.findByIdAndUpdate(
       idProyecto,
       { $push: { puntuacion } },
       { new: true },
     );
+
+    if (!proyectoActualizado) {
+      throw new Error('Proyecto no encontrado');
+    }
+
+    // Buscar si ya existe un ranking para este proyecto
+    let ranking = await this.rankingModel.findOne({ projectID: idProyecto });
+
+    if (ranking) {
+      // Si existe, recalcular el promedio y actualizar
+      const puntuaciones = proyectoActualizado.puntuacion || [];
+      const suma = puntuaciones.reduce((acc, val) => acc + val, 0);
+      const promedio = puntuaciones.length > 0 ? suma / puntuaciones.length : 0;
+      ranking.averageScore = promedio;
+      ranking.updatedAt = new Date();
+      await ranking.save();
+    } else {
+      // Si no existe, crear el ranking con la puntuación agregada
+      ranking = new this.rankingModel({
+        projectID: idProyecto,
+        averageScore: puntuacion,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      await ranking.save();
+    }
+
+    return proyectoActualizado;
   }
 
   async obtenerPromedioPuntuacion(idProyecto: string): Promise<number | null> {
@@ -114,28 +142,21 @@ export class ProcesosService {
 
   async ranking() {
     try {
-      // Obtener todos los proyectos con sus puntuaciones
-      const proyectos = await this.projectModel.find();
-      // Calcular la suma de puntuaciones para cada proyecto y ordenar
-      const proyectosConPuntuacion = proyectos.map((proyecto) => {
-        const sumaPuntuacion =
-          proyecto.puntuacion && proyecto.puntuacion.length > 0
-            ? proyecto.puntuacion.reduce((acc, val) => acc + val, 0)
-            : 0;
+      // 1. Obtener los 10 rankings con mayor averageScore
+      const topRankings = await this.rankingModel.find()
+        .sort({ averageScore: -1 })
+        .limit(10);
 
-        return {
-          ...proyecto.toObject(),
-          sumaPuntuacion,
-        };
-      });
+      // 2. Extraer los IDs de los proyectos
+      const projectIds = topRankings.map(r => r.projectID);
 
-      // Ordenar de mayor a menor puntuación y tomar solo los primeros 10
-      const top10Proyectos = proyectosConPuntuacion
-        .sort((a, b) => b.sumaPuntuacion - a.sumaPuntuacion)
-        .slice(0, 10);
+      // 3. Buscar los proyectos correspondientes
+      const projects = await this.projectModel.find({ _id: { $in: projectIds } });
 
+      // 4. Ordenar los proyectos según el orden de los rankings
+      const projectsOrdered = projectIds.map(id => projects.find(p => p._id.toString() == id));
       return {
-        data: top10Proyectos,
+        data: projectsOrdered,
         operation: true,
       };
     } catch (error) {
@@ -369,7 +390,7 @@ export class ProcesosService {
       const proyectosDelUsuario = await this.projectModel.find({
         authors: userId,
       });
-      
+
       for (const proyecto of proyectosDelUsuario) {
         // Eliminar todos los comentarios del proyecto
         await this.commentModel.deleteMany({ projectID: proyecto._id });
@@ -396,6 +417,10 @@ export class ProcesosService {
     const user = await this.getUser(admin);
     if (user && user.role == 'admin') {
       const proyecto = await this.projectModel.findByIdAndDelete(id);
+      // Eliminar el ranking si existe
+      await this.rankingModel.findOneAndDelete({ projectID: id });
+      // Eliminar los comentarios del proyecto
+      await this.commentModel.deleteMany({ projectID: id});
       return proyecto;
     }
     throw new Error('No tienes permisos para eliminar proyectos');
@@ -465,6 +490,10 @@ export class ProcesosService {
     const proyecto = await this.projectModel.findById(id);
     if (proyecto && proyecto.authors.includes(userId)) {
       await this.projectModel.findByIdAndDelete(id);
+      // Eliminar los comentarios del proyecto
+      await this.commentModel.deleteMany({ projectID: id });
+      // Eliminar el ranking si existe
+      await this.rankingModel.findOneAndDelete({ projectID: id });
       return proyecto;
     }
     throw new Error('No tienes permisos para eliminar este proyecto');
@@ -513,7 +542,7 @@ export class ProcesosService {
 
     // Preparar el array de links
     const links = [...(user.links || [])];
-    
+
     // Si se proporciona website, agregarlo o actualizarlo en la posición 0
     if (profileData.website !== undefined) {
       if (links.length > 0) {
@@ -522,7 +551,7 @@ export class ProcesosService {
         links.push(profileData.website);
       }
     }
-    
+
     // Si se proporciona github, agregarlo o actualizarlo en la posición 1
     if (profileData.github !== undefined) {
       if (links.length > 1) {
@@ -558,7 +587,7 @@ export class ProcesosService {
           model: 'users'
         })
         .sort({ createdAt: -1 });
-      
+
       return evaluaciones;
     } catch (error) {
       throw new Error('Error al obtener las evaluaciones del proyecto');
@@ -575,12 +604,15 @@ export class ProcesosService {
     const proyectosDelUsuario = await this.projectModel.find({
       authors: userId,
     });
-    
+
     for (const proyecto of proyectosDelUsuario) {
       // Eliminar todos los comentarios del proyecto
       await this.commentModel.deleteMany({ projectID: proyecto._id });
+      // Eliminar el ranking si existe
+      await this.rankingModel.findOneAndDelete({ projectID: proyecto._id });
       // Eliminar el proyecto
       await this.projectModel.findByIdAndDelete(proyecto._id);
+
     }
 
     // Eliminar todos los comentarios del usuario
@@ -616,4 +648,32 @@ export class ProcesosService {
     await this.userModel.findByIdAndDelete(userId);
     return user;
   }
+
+  // Método para crear rankings de todos los proyectos con nota > 0
+  async crearRankingsParaProyectosConNota() {
+    // Obtener todos los proyectos
+    const proyectos = await this.projectModel.find();
+    for (const proyecto of proyectos) {
+      // Sumar las notas del array puntuacion
+      const suma = (proyecto.puntuacion || []).reduce((acc, val) => acc + val, 0);
+      if (suma > 0) {
+        // Calcular el promedio
+        const promedio = proyecto.puntuacion.length > 0 ? suma / proyecto.puntuacion.length : 0;
+        // Verificar si ya existe un ranking para este proyecto
+        let ranking = await this.rankingModel.findOne({ projectID: proyecto._id });
+        if (!ranking) {
+          // Crear el ranking si no existe
+          ranking = new this.rankingModel({
+            projectID: proyecto._id,
+            averageScore: promedio,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          await ranking.save();
+        }
+      }
+    }
+    return { message: 'Rankings creados para proyectos con nota > 0' };
+  }
+  
 }
