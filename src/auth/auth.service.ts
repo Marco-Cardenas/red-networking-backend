@@ -69,12 +69,19 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Usuario no encontrado');
     }
+    // Generar nueva contraseña aleatoria
+    const newPassword = Math.random().toString(36).slice(-10);
+    // Hashear la nueva contraseña
+    user.password = bcrypt.hashSync(newPassword, 10);
+    // Generar token de recuperación
     const token = this.jwtService.sign({ id: user._id, email: user.email });
     let subject = 'Recuperación de contraseña';
+    // Enviar correo con la nueva contraseña y el token
     await this.emailService.sendEmail(user.email, subject, {
       baseUrl: '',
       token,
       type: 'forgot-password',
+      newPassword,
     });
 
     user.remember_token = token;
