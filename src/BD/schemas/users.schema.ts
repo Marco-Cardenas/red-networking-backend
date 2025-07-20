@@ -5,40 +5,43 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-  @Prop({default: ''})
+  @Prop({ default: '' })
   name: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   email: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
+  born: string;
+
+  @Prop({ default: '' })
   password: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   fotoPerfil: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   bio: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   university: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   career: string;
 
-  @Prop({default: ''})
+  @Prop({ default: '' })
   role: string;
 
-  @Prop({type:[String], default: ''})
+  @Prop({ type: [String], default: '' })
   links: string[];
 
-  @Prop({type:[String], default: ''})
+  @Prop({ type: [String], default: '' })
   badges: string[];
 
-  @Prop({default: Date.now})
+  @Prop({ default: Date.now })
   createdAt: Date;
 
-  @Prop({default: Date.now})
+  @Prop({ default: Date.now })
   updatedAt: Date;
 }
 
