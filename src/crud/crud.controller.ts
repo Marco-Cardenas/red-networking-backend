@@ -558,4 +558,16 @@ export class CrudController {
     }
   }
 
+  @Delete('account/:userId')
+  async eliminarCuenta(@Param('userId') userId: string, @Res() res) {
+    try {
+      const evaluacion = await this.procesosService.eliminarCuenta(userId);
+      return res.status(HttpStatus.OK).json({ ok: true, evaluacion });
+    } catch (error) {
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ ok: false, error: error.message });
+    }
+  }
+
 }

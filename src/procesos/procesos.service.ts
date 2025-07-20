@@ -309,6 +309,8 @@ export class ProcesosService {
       }
       console.log(mjs);
     }
+    console.log('eduard');
+    console.log(mjs);
 
     // Llamada a la API de Google Gemini (gratuita)
     try {
@@ -561,5 +563,63 @@ export class ProcesosService {
     } catch (error) {
       throw new Error('Error al obtener las evaluaciones del proyecto');
     }
+  }
+
+  async eliminarCuenta(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('Usuario no encontrado');
+    }
+
+    // Eliminar todos los proyectos donde el usuario sea autor
+    const proyectosDelUsuario = await this.projectModel.find({
+      authors: userId,
+    });
+    
+    for (const proyecto of proyectosDelUsuario) {
+      // Eliminar todos los comentarios del proyecto
+      await this.commentModel.deleteMany({ projectID: proyecto._id });
+      // Eliminar el proyecto
+      await this.projectModel.findByIdAndDelete(proyecto._id);
+    }
+
+    // Eliminar todos los comentarios del usuario
+    await this.commentModel.deleteMany({ authorID: userId });
+
+    // Si el usuario es profesor, eliminar todas sus evaluaciones
+    if (user.role === 'profesor') {
+      await this.ratingModel.deleteMany({ teacherID: userId });
+    }
+
+    // Eliminar todas las evaluaciones donde el usuario sea el profesor evaluador
+    await this.ratingModel.deleteMany({ teacherID: userId });
+
+    // Eliminar todas las puntuaciones del usuario en proyectos (si existe)
+    await this.projectModel.updateMany(
+      { puntuacion: { $exists: true } },
+      { $pull: { puntuacion: { $in: [userId] } } }
+    );
+
+    // Eliminar likes del usuario en comentarios
+    await this.commentModel.updateMany(
+      { likes: userId },
+      { $pull: { likes: userId } }
+    );
+
+    // Eliminar el usuario de favoritos de otros usuarios
+    await this.userModel.updateMany(
+      { favorites: userId },
+      { $pull: { favorites: userId } }
+    );
+
+    // Eliminar el usuario de la lista de autores en proyectos donde no sea el único autor
+    await this.projectModel.updateMany(
+      { authors: userId },
+      { $pull: { authors: userId } }
+    );
+
+    // Finalmente eliminar el usuario
+    await this.userModel.findByIdAndDelete(userId);
+    return user;
   }
 }
